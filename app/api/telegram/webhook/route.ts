@@ -58,6 +58,11 @@ async function sendPhotoBuffer(chatId: string, imageBuffer: ArrayBuffer, caption
 }
 
 export async function POST(req: Request) {
+  const secretHeader = req.headers.get("x-telegram-bot-api-secret-token")
+  if (secretHeader !== process.env.TELEGRAM_WEBHOOK_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const update = await req.json()
   const message = update.message
 
