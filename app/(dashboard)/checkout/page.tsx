@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,7 +11,8 @@ const PLAN_LABELS: Record<string, { name: string; price: string }> = {
   pro: { name: "Pro", price: "₹1,999/month" },
 }
 
-export default function CheckoutPage() {
+// 1. Internal content component handling searchParams and logic
+function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const plan = searchParams.get("plan") || "starter"
@@ -60,5 +61,22 @@ export default function CheckoutPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+// 2. Main default export wrapped in a Suspense boundary for Next.js static engine
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="mx-auto flex min-h-screen max-w-md items-center justify-center p-8">
+        <Card className="w-full">
+          <CardContent className="pt-6 text-center text-sm text-muted-foreground">
+            Loading checkout...
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   )
 }
